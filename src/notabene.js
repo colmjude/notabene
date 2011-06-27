@@ -13,6 +13,12 @@ var notabene = {
 		}
 		return url;
 	},
+	defaultFields: {},
+	watchPosition: function(handler) {
+		if(!!navigator.geolocation) {
+			navigator.geolocation.watchPosition(handler);
+		}
+	},
 	supports_local_storage: function() {
 		try {
 			return 'localStorage' in window && window['localStorage'] !== null;
@@ -84,6 +90,13 @@ function notes(container, options) {
 		note = new tiddlyweb.Tiddler(tempTitle, bag);
 		note.fields = {};
 		note.fields.created = new Date();
+		notabene.watchPosition(function(data) {
+			if(data) {
+				var coords = data.coords;
+				note.fields['geo.lat'] = String(coords.latitude);
+				note.fields['geo.long'] = String(coords.longitude);
+			}
+		});
 		loadNote();
 	}
 
